@@ -9,12 +9,27 @@
 typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
 header ethernet_t {
-    /* TODO: define Ethernet header */ 
+    /* TODO: define Ethernet header */
+    macAddr_t dst_address;
+    macAddr_t src_address;
+    bit<16> ether_type; 
 }
 
 /* a basic ip header without options and pad */
 header ipv4_t {
     /* TODO: define IP header */ 
+    bit<4> version;
+    bit<4> header_length;
+    bit<8> type_of_service;
+    bit<16> length;
+    bit<16> identification;
+    bit<3> flags;
+    bit<13> offset;
+    bit<8> ttl;
+    bit<8> protocol;
+    bit<16> checksum;
+    ipAddr_t src_address;
+    ipAddr_t dst_address;
 }
 
 struct metadata {
@@ -45,7 +60,12 @@ parser MyParser(packet_in packet,
     }
     state parse_ethernet {
         /* TODO: do ethernet header parsing */
+        packet.extract(hdr.ethernet);
         /* if the frame type is IPv4, go to IPv4 parsing */ 
+        transition select(hdr.ether_type) {
+            ETHER_IPV4: parse_ipv4;
+            default: accept;
+        }
     }
 
     state parse_ipv4 {
