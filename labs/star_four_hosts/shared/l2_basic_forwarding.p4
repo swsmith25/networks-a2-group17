@@ -11,7 +11,7 @@ header ethernet_t {
     /* TODO: Define ethernet header*/
     bit<48> dst_address;
     bit<48> src_address;
-    bit<8> ether_type;
+    bit<16> ether_type;
 }
 
 /* digest format for mac learning*/
@@ -95,11 +95,10 @@ control MyIngress(inout headers hdr,
         actions = {
             forward_to_port;
             broadcast;
-            drop;
         }
         size = 4;
         support_timeout = true;
-        default_action = drop;
+        default_action = broadcast;
     }
 
     /* check if the mac address to port mapping exists */
@@ -109,12 +108,12 @@ control MyIngress(inout headers hdr,
             hdr.ethernet.src_address: exact;
         }
         actions = {
-            NoAction;
             learn;
+            NoAction;
         }
         size = 4;
         support_timeout = true;
-        default_action = NoAction;
+        default_action = learn;
     }
 
     /* applying tables */

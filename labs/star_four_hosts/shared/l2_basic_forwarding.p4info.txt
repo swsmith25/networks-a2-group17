@@ -19,9 +19,6 @@ tables {
   action_refs {
     id: 22516369
   }
-  action_refs {
-    id: 25652968
-  }
   size: 4
   idle_timeout_behavior: NOTIFY_CONTROL
 }
@@ -38,10 +35,10 @@ tables {
     match_type: EXACT
   }
   action_refs {
-    id: 21257015
+    id: 23630042
   }
   action_refs {
-    id: 23630042
+    id: 21257015
   }
   size: 4
   idle_timeout_behavior: NOTIFY_CONTROL
@@ -52,13 +49,6 @@ actions {
     name: "NoAction"
     alias: "NoAction"
     annotations: "@noWarn(\"unused\")"
-  }
-}
-actions {
-  preamble {
-    id: 25652968
-    name: "MyIngress.drop"
-    alias: "drop"
   }
 }
 actions {

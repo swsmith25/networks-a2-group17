@@ -43,7 +43,7 @@
       "fields" : [
         ["dst_address", 48, false],
         ["src_address", 48, false],
-        ["ether_type", 8, false]
+        ["ether_type", 16, false]
       ]
     }
   ],
@@ -139,7 +139,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "/shared/l2_basic_forwarding.p4",
-        "line" : 154,
+        "line" : 153,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
@@ -181,30 +181,8 @@
       "primitives" : []
     },
     {
-      "name" : "MyIngress.drop",
-      "id" : 1,
-      "runtime_data" : [],
-      "primitives" : [
-        {
-          "op" : "mark_to_drop",
-          "parameters" : [
-            {
-              "type" : "header",
-              "value" : "standard_metadata"
-            }
-          ],
-          "source_info" : {
-            "filename" : "/shared/l2_basic_forwarding.p4",
-            "line" : 67,
-            "column" : 8,
-            "source_fragment" : "mark_to_drop(standard_metadata)"
-          }
-        }
-      ]
-    },
-    {
       "name" : "MyIngress.forward_to_port",
-      "id" : 2,
+      "id" : 1,
       "runtime_data" : [
         {
           "name" : "egress_port",
@@ -235,7 +213,7 @@
     },
     {
       "name" : "MyIngress.broadcast",
-      "id" : 3,
+      "id" : 2,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -274,7 +252,7 @@
     },
     {
       "name" : "MyIngress.learn",
-      "id" : 4,
+      "id" : 3,
       "runtime_data" : [],
       "primitives" : [
         {
@@ -373,7 +351,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "/shared/l2_basic_forwarding.p4",
-            "line" : 106,
+            "line" : 105,
             "column" : 10,
             "source_fragment" : "smac_table"
           },
@@ -391,15 +369,15 @@
           "with_counters" : false,
           "support_timeout" : true,
           "direct_meters" : null,
-          "action_ids" : [0, 4],
-          "actions" : ["NoAction", "MyIngress.learn"],
+          "action_ids" : [3, 0],
+          "actions" : ["MyIngress.learn", "NoAction"],
           "base_default_next" : "MyIngress.dmac_forward",
           "next_tables" : {
-            "NoAction" : "MyIngress.dmac_forward",
-            "MyIngress.learn" : "MyIngress.dmac_forward"
+            "MyIngress.learn" : "MyIngress.dmac_forward",
+            "NoAction" : "MyIngress.dmac_forward"
           },
           "default_entry" : {
-            "action_id" : 0,
+            "action_id" : 3,
             "action_const" : false,
             "action_data" : [],
             "action_entry_const" : false
@@ -428,16 +406,15 @@
           "with_counters" : false,
           "support_timeout" : true,
           "direct_meters" : null,
-          "action_ids" : [2, 3, 1],
-          "actions" : ["MyIngress.forward_to_port", "MyIngress.broadcast", "MyIngress.drop"],
+          "action_ids" : [1, 2],
+          "actions" : ["MyIngress.forward_to_port", "MyIngress.broadcast"],
           "base_default_next" : null,
           "next_tables" : {
             "MyIngress.forward_to_port" : null,
-            "MyIngress.broadcast" : null,
-            "MyIngress.drop" : null
+            "MyIngress.broadcast" : null
           },
           "default_entry" : {
-            "action_id" : 1,
+            "action_id" : 2,
             "action_const" : false,
             "action_data" : [],
             "action_entry_const" : false
@@ -452,7 +429,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "/shared/l2_basic_forwarding.p4",
-        "line" : 131,
+        "line" : 130,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },
