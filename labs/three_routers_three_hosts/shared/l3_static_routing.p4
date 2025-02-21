@@ -176,7 +176,7 @@ control MyIngress(inout headers hdr,
         /* TODO: Implement a routing logic */
         /* 1. Lookup IPv4 routing table */
         ipv4_route.apply();
-        // TODO: check if egress_spec == drop port?
+        // TODO: handle drop for both parts
         // if (standard_metadata.egress_spec == DROP_PORT) return;
         /* 2. Upon hit, lookup ARP table */
         arp_table.apply();
