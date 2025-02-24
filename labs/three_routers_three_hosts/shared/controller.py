@@ -48,7 +48,8 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
                 egress_port = int(ip_mac_pair[4].strip('\n'))
                 prefix_len = int(prefix_len)
 
-                print(ip_mac_pair) # TODO: delete this
+                # print(ip_mac_pair) # TODO: delete this
+                
                 print ("Add routing table entry", prefix, prefix_len, next_hop_ip)
                 # TODO: Add table entries to "MyIngress.ipv4_route"
                 # They represent the prefix of dstIP to next hop IP mapping.

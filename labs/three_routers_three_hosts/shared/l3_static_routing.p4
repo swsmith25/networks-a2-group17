@@ -9,7 +9,6 @@
 typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
 header ethernet_t {
-    /* TODO: define Ethernet header */
     macAddr_t dst_address;
     macAddr_t src_address;
     bit<16> ether_type; 
@@ -17,7 +16,6 @@ header ethernet_t {
 
 /* a basic ip header without options and pad */
 header ipv4_t {
-    /* TODO: define IP header */ 
     bit<4> version;
     bit<4> header_length;
     bit<8> type_of_service;
@@ -58,8 +56,9 @@ parser MyParser(packet_in packet,
     state start {
         transition parse_ethernet;
     }
+
+
     state parse_ethernet {
-        /* TODO: do ethernet header parsing */
         packet.extract(hdr.ethernet);
         /* if the frame type is IPv4, go to IPv4 parsing */ 
         transition select(hdr.ethernet.ether_type) {
@@ -81,8 +80,16 @@ parser MyParser(packet_in packet,
 
 control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
     apply {
-        /* TODO: verify checksum using verify_checksum() extern */
+        /* verify checksum using verify_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */ 
+        verify_checksum(
+            hdr.ipv4.isValid(),
+            { hdr.ipv4.version, hdr.ipv4.ihl, hdr.ipv4.diffserv, hdr.ipv4.totalLen,
+              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.fragOffset, hdr.ipv4.ttl, hdr.ipv4.protocol,
+              hdr.ipv4.srcAddr, hdr.ipv4.dstAddr },
+            hdr.ipv4.hdrChecksum, HashAlgorithm.csum16
+        );
+
     }
 }
 
@@ -101,53 +108,50 @@ control MyIngress(inout headers hdr,
     }
 
     action forward_to_port(bit<9> egress_port, macAddr_t egress_mac) {
-        /* TODO: change the packet's source MAC address to egress_mac */
         /* Then set the egress_spec in the packet's standard_metadata to egress_port */
         hdr.ethernet.src_address = egress_mac;
         standard_metadata.egress_spec = egress_port;
     }
    
     action decrement_ttl() {
-        /* TODO: decrement the IPv4 header's TTL field by one */
+        /* decrement the IPv4 header's TTL field by one */
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
 
     action forward_to_next_hop(ipAddr_t next_hop){
-        /* TODO: write next_hop to metadata's next_hop field */
-        meta.next_hop = next_hop;
+        meta.next_hop = next_hop; //set hop IP in meta
     }
 
     action change_dst_mac (macAddr_t dst_mac) {
-        /* TODO: change a packet's destination MAC address to dst_mac*/
-        hdr.ethernet.dst_address = dst_mac;
+        hdr.ethernet.dst_address = dst_mac; //set dst MAC
     }
 
     /* define routing table */
     table ipv4_route {
-        /* TODO: define a static ipv4 routing table */
-        /* Perform longest prefix matching on dstIP then */
-        /* record the next hop IP address in the metadata's next_hop field*/
+        /* define a static ipv4 routing table */
+
         key = {
-            hdr.ipv4.dst_address: lpm;
+            hdr.ipv4.dst_address: lpm;  //long prefix matching
         }
         actions = {
-            forward_to_next_hop;
-            drop;
+            forward_to_next_hop; //record nexthop
+            drop; //drop otherwise
         }
-        size = 1024;
-        default_action = drop;
+
+        size = 1024; //table size
+        default_action = drop; //default = dropslay
     }
 
     /* define static ARP table */
     table arp_table {
-        /* TODO: define a static ARP table */
+        /* static ARP table */
         /* Perform exact matching on metadata's next_hop field then */
         /* modify the packet's src and dst MAC addresses upon match */
         key = {
-            meta.next_hop: exact;
+            meta.next_hop: exact; //exact matching
         }
         actions = {
-            change_dst_mac;
+            change_dst_mac; //change src and dst MAC
             drop;
         }
         size = 1024;
@@ -157,14 +161,13 @@ control MyIngress(inout headers hdr,
 
     /* define forwarding table */
     table dmac_forward {
-        /* TODO: define a static forwarding table */
         /* Perform exact matching on dstMAC then */
         /* forward to the corresponding egress port */ 
         key = {
-            hdr.ethernet.dst_address: exact;
+            hdr.ethernet.dst_address: exact; //exact matching
         }
         actions = {
-            forward_to_port;
+            forward_to_port; 
             drop;
         }
         size = 1024;
@@ -173,15 +176,21 @@ control MyIngress(inout headers hdr,
    
     /* applying dmac */
     apply {
-        /* TODO: Implement a routing logic */
+        
         /* 1. Lookup IPv4 routing table */
         ipv4_route.apply();
-        // TODO: handle drop for both parts
-        // if (standard_metadata.egress_spec == DROP_PORT) return;
+        // handle drop for both parts
+        if (standard_metadata.egress_spec == 0){
+            drop(); //no route found
+            return;
+        }
+
         /* 2. Upon hit, lookup ARP table */
         arp_table.apply();
+
         /* 3. Upon hit, Decrement ttl */
         decrement_ttl();
+
         /* 4. Then lookup forwarding table */  
         dmac_forward.apply();
     }
@@ -205,9 +214,17 @@ control MyEgress(inout headers hdr,
 
 control MyComputeChecksum(inout headers hdr, inout metadata meta) {
     apply {
-        /* TODO: calculate the modified packet's checksum */
+        /* calculate the modified packet's checksum */
         /* using update_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */
+        update_checksum(
+            hdr.ip4.isValid(),
+            { hdr.ip4.version, hdr.ip4.ihl, hdr.ip4.diffserv, hdr.ip4.totalLen,
+              hdr.ip4.identification, hdr.ip4.flags, hdr.ip4.fragOffset, hdr.ip4.ttl, hdr.ip4.protocol,
+              hdr.ip4.srcAddr, hdr.ip4.dstAddr },
+            hdr.ip4.hdrChecksum, HashAlgorithm.csum16
+        );
+
     } 
 }
 
