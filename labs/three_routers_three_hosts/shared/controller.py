@@ -62,8 +62,8 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
                 ipv4_route_table_entry = p4info_helper.buildTableEntry(
                     table_name="MyIngress.ipv4_route",
                     match_fields={
-                        "hdr.ipv4.dst_address": (prefix, prefix_len)
-                    },  # TODO: this line breaks; added len in
+                        "hdr.ipv4.dstAddr": (prefix, prefix_len)
+                    },
                     action_name="MyIngress.forward_to_next_hop",
                     action_params={"next_hop": next_hop_ip},
                 )
