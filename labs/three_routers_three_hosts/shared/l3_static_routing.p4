@@ -218,11 +218,11 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
         /* using update_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */
         update_checksum(
-            hdr.ip4.isValid(),
-            { hdr.ip4.version, hdr.ip4.ihl, hdr.ip4.diffserv, hdr.ip4.totalLen,
-              hdr.ip4.identification, hdr.ip4.flags, hdr.ip4.fragOffset, hdr.ip4.ttl, hdr.ip4.protocol,
-              hdr.ip4.srcAddr, hdr.ip4.dstAddr },
-            hdr.ip4.hdrChecksum, HashAlgorithm.csum16
+            hdr.ipv4.isValid(),
+            { hdr.ipv4.version, hdr.ipv4.ihl, hdr.ipv4.diffserv, hdr.ipv4.totalLen,
+              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.fragOffset, hdr.ipv4.ttl, hdr.ipv4.protocol,
+              hdr.ipv4.srcAddr, hdr.ipv4.dstAddr },
+            hdr.ipv4.hdrChecksum, HashAlgorithm.csum16
         );
 
     } 

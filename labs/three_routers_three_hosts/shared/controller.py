@@ -72,7 +72,6 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
 
                 print("Add ARP table entry", next_hop_ip, next_hop_mac)
 
-                # TODO: Add table entries to "MyIngress.arp_table"
                 # They represent the next hop IP to dstMAC mapping.
                 # 1. Use p4info_helper's buildTableEntry() method to build a table_entry
                 # 2. Add the table_entry to the switch by calling s1's WriteTableEntry() method
@@ -86,7 +85,6 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
 
                 print("Add MAC table entry", next_hop_mac, egress_port, egress_mac)
 
-                # TODO: Add table entries to "MyIngress.dmac_forward"
                 # They represent the dstMAC to egress port and MAC mapping.
                 # 1. Use p4info_helper's buildTableEntry() method to build a table_entry
                 # 2. Add the table_entry to the switch by calling s1's WriteTableEntry() method
