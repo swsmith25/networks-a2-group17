@@ -19,15 +19,15 @@ header ipv4_t {
     bit<4> version;
     bit<4> header_length;
     bit<8> type_of_service;
-    bit<16> length;
+    bit<16> len;
     bit<16> identification;
     bit<3> flags;
     bit<13> offset;
     bit<8> ttl;
     bit<8> protocol;
     bit<16> checksum;
-    ipAddr_t src_address;
-    ipAddr_t dst_address;
+    ipAddr_t srcAddr;
+    ipAddr_t dstAddr;
 }
 
 struct metadata {
@@ -84,10 +84,10 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
         /* Use HashAlgorithm.csum16 as a hash algorithm */ 
         verify_checksum(
             hdr.ipv4.isValid(),
-            { hdr.ipv4.version, hdr.ipv4.ihl, hdr.ipv4.diffserv, hdr.ipv4.totalLen,
-              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.fragOffset, hdr.ipv4.ttl, hdr.ipv4.protocol,
+            { hdr.ipv4.version, hdr.ipv4.header_length, hdr.ipv4.type_of_service, hdr.ipv4.len,
+              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.offset, hdr.ipv4.ttl, hdr.ipv4.protocol,
               hdr.ipv4.srcAddr, hdr.ipv4.dstAddr },
-            hdr.ipv4.hdrChecksum, HashAlgorithm.csum16
+            hdr.ipv4.checksum, HashAlgorithm.csum16
         );
 
     }
@@ -219,10 +219,10 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
         /* Use HashAlgorithm.csum16 as a hash algorithm */
         update_checksum(
             hdr.ipv4.isValid(),
-            { hdr.ipv4.version, hdr.ipv4.ihl, hdr.ipv4.diffserv, hdr.ipv4.totalLen,
-              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.fragOffset, hdr.ipv4.ttl, hdr.ipv4.protocol,
+            { hdr.ipv4.version, hdr.ipv4.header_length, hdr.ipv4.type_of_service, hdr.ipv4.len,
+              hdr.ipv4.identification, hdr.ipv4.flags, hdr.ipv4.offset, hdr.ipv4.ttl, hdr.ipv4.protocol,
               hdr.ipv4.srcAddr, hdr.ipv4.dstAddr },
-            hdr.ipv4.hdrChecksum, HashAlgorithm.csum16
+            hdr.ipv4.checksum, HashAlgorithm.csum16
         );
 
     } 
