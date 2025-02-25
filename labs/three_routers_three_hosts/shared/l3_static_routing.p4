@@ -131,7 +131,7 @@ control MyIngress(inout headers hdr,
         /* define a static ipv4 routing table */
 
         key = {
-            hdr.ipv4.dst_address: lpm;  //long prefix matching
+            hdr.ipv4.dstAddr: lpm;  //long prefix matching
         }
         actions = {
             forward_to_next_hop; //record nexthop
