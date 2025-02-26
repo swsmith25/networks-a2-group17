@@ -8,6 +8,8 @@
 
 typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
+typedef bit<9>  egressSpec_t;
+
 header ethernet_t {
     macAddr_t dst_address;
     macAddr_t src_address;
@@ -179,11 +181,6 @@ control MyIngress(inout headers hdr,
         
         /* 1. Lookup IPv4 routing table */
         ipv4_route.apply();
-        // handle drop for both parts
-        if (standard_metadata.egress_spec == 0){
-            drop(); //no route found
-            return;
-        }
 
         /* 2. Upon hit, lookup ARP table */
         arp_table.apply();
@@ -193,6 +190,12 @@ control MyIngress(inout headers hdr,
 
         /* 4. Then lookup forwarding table */  
         dmac_forward.apply();
+
+         // handle drop for both parts
+        if (standard_metadata.egress_spec == 0){
+            drop(); //no route found
+            return;
+        }
     }
 }
 
@@ -205,7 +208,26 @@ control MyEgress(inout headers hdr,
                  inout standard_metadata_t standard_metadata) {
 
 
-    apply {  }
+    
+    action set_smac(macAddr_t src_mac) {
+        hdr.ethernet.src_address = src_mac; // update source MAC address
+    }
+
+    table smac_rewrite {
+        key = {
+            standard_metadata.egress_port: exact; // match egress port
+        }
+        actions = {
+            set_smac; // rewriting source MAC address
+            drop;
+        }
+        size = 1024;
+        default_action = drop;
+    }
+
+    apply {
+        smac_rewrite.apply(); // put source MAC in rewrite table
+    }
 }
 
 /*************************************************************************

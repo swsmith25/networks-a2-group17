@@ -51,8 +51,6 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
                 egress_port = int(ip_mac_pair[4].strip("\n"))
                 prefix_len = int(prefix_len)
 
-                # print(ip_mac_pair) # TODO: delete this
-
                 print("Add routing table entry", prefix, prefix_len, next_hop_ip)
 
                 # TODO: Add table entries to "MyIngress.ipv4_route"
@@ -66,7 +64,7 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
                     },
                     action_name="MyIngress.forward_to_next_hop",
                     action_params={"next_hop": next_hop_ip},
-                )
+                 ) #mmaybe wrong
 
                 s1.WriteTableEntry(ipv4_route_table_entry)
 
