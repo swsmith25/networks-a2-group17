@@ -191,7 +191,7 @@ control MyIngress(inout headers hdr,
         /* 4. Then lookup forwarding table */  
         dmac_forward.apply();
 
-         // handle drop for both parts
+         // 5. handle drop for both parts
         if (standard_metadata.egress_spec == 0){
             drop(); //no route found
             return;
@@ -209,24 +209,24 @@ control MyEgress(inout headers hdr,
 
 
     
-    action set_smac(macAddr_t src_mac) {
-        hdr.ethernet.src_address = src_mac; // update source MAC address
-    }
+    // action set_smac(macAddr_t src_mac) {
+    //     hdr.ethernet.src_address = src_mac; // update source MAC address
+    // }
 
-    table smac_rewrite {
-        key = {
-            standard_metadata.egress_port: exact; // match egress port
-        }
-        actions = {
-            set_smac; // rewriting source MAC address
-            drop;
-        }
-        size = 1024;
-        default_action = drop;
-    }
+    // table smac_rewrite {
+    //     key = {
+    //         standard_metadata.egress_port: exact; // match egress port
+    //     }
+    //     actions = {
+    //         set_smac; // rewriting source MAC address
+    //         drop;
+    //     }
+    //     size = 1024;
+    //     default_action = drop;
+    // }
 
     apply {
-        smac_rewrite.apply(); // put source MAC in rewrite table
+        //smac_rewrite.apply(); // put source MAC in rewrite table
     }
 }
 
